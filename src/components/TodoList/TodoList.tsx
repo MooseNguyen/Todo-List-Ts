@@ -4,10 +4,12 @@ import styles from './todoList.module.scss'
 
 function TodoList() {
   return (
-    <div>
-      TodoList
-      <TaskInput />
-      <TaskList />
+    <div className={styles.todoList}>
+      <div className={styles.todoListContainer}>
+        <TaskInput />
+        <TaskList doneTaskList />
+        <TaskList />
+      </div>
     </div>
   )
 }
