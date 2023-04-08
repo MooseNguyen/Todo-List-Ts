@@ -4,11 +4,12 @@ import styles from './taskList.module.scss'
 interface TaskListProps {
   doneTaskList?: boolean
   todos: Todo[]
-  handlerDoneTodo: (idTodo: string, done: boolean) => void
+  handlerDoneTodo: (idTodo: string, done: boolean) => any
+  startEditTodo: (idTodo: string) => any
 }
 
 function TaskList(props: TaskListProps) {
-  const { doneTaskList, todos, handlerDoneTodo } = props
+  const { doneTaskList, todos, handlerDoneTodo, startEditTodo } = props
 
   const handlerCheckbox = (idTodo: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     handlerDoneTodo(idTodo, e.target.checked)
@@ -28,7 +29,9 @@ function TaskList(props: TaskListProps) {
             />
             <span className={`${styles.taskName} ${todo.done ? styles.taskNameDone : ''}`}>{todo.name}</span>
             <div className={styles.taskActions}>
-              <button className={styles.taskBtn}>✎</button>
+              <button className={styles.taskBtn} onClick={() => startEditTodo(todo.id)}>
+                ✎
+              </button>
               <button className={styles.taskBtn}>🗑</button>
             </div>
           </div>
