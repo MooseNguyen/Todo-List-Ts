@@ -1,8 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import TaskInput from '../TaskInput'
 import TaskList from '../TaskList'
 import styles from './todoList.module.scss'
 import { Todo } from '../../@types/todo.type'
+
+type HandlerNewTodos = (todos: Todo[]) => Todo[]
+
+const syncTodosToLocal = (hanlderNewTodos: HandlerNewTodos) => {
+  const todosString = localStorage.getItem('todos')
+  const todosObj: Todo[] = JSON.parse(todosString || '[]')
+  const newTodosObj = hanlderNewTodos(todosObj)
+  localStorage.setItem('todos', JSON.stringify(newTodosObj))
+}
 
 function TodoList() {
   const [todos, setTodos] = useState<Todo[]>([])
@@ -11,6 +20,12 @@ function TodoList() {
   const doneTodo = todos.filter((todo) => todo.done)
   const notdoneTodo = todos.filter((todo) => !todo.done)
 
+  useEffect(() => {
+    const todosString = localStorage.getItem('todos')
+    const todosObj: Todo[] = JSON.parse(todosString || '[]')
+    setTodos(todosObj)
+  }, [])
+
   const addTodo = (name: string) => {
     const todo: Todo = {
       name,
@@ -18,6 +33,7 @@ function TodoList() {
       id: new Date().toISOString()
     }
     setTodos((prev) => [...prev, todo])
+    syncTodosToLocal((todosObj: Todo[]) => [...todosObj, todo])
   }
 
   const handlerDoneTodo = (idTodo: string, done: boolean) => {
@@ -46,28 +62,32 @@ function TodoList() {
   }
 
   const finishEditTodo = () => {
-    setTodos((prev) => {
-      return prev.map((todo) => {
+    const handler = (todosObj: Todo[]) => {
+      return todosObj.map((todo) => {
         if (todo.id === currentTodo?.id) {
           return currentTodo
         }
         return todo
       })
-    })
+    }
+    setTodos(handler)
     setCurrentTodo(null)
+    syncTodosToLocal(handler)
   }
 
   const deleteTodo = (idTodo: string) => {
     if (currentTodo) setCurrentTodo(null)
-    setTodos((prev) => {
-      const findIndexTodo = prev.findIndex((todo) => todo.id === idTodo)
+    const handler = (todosObj: Todo[]) => {
+      const findIndexTodo = todosObj.findIndex((todo) => todo.id === idTodo)
       if (findIndexTodo > -1) {
-        const result = [...prev]
+        const result = [...todosObj]
         result.splice(findIndexTodo, 1)
         return result
       }
-      return prev
-    })
+      return todosObj
+    }
+    setTodos(handler)
+    syncTodosToLocal(handler)
   }
 
   return (
