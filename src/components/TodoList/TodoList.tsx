@@ -57,12 +57,36 @@ function TodoList() {
     setCurrentTodo(null)
   }
 
+  const deleteTodo = (idTodo: string) => {
+    if (currentTodo) setCurrentTodo(null)
+    setTodos((prev) => {
+      const findIndexTodo = prev.findIndex((todo) => todo.id === idTodo)
+      if (findIndexTodo > -1) {
+        const result = [...prev]
+        result.splice(findIndexTodo, 1)
+        return result
+      }
+      return prev
+    })
+  }
+
   return (
     <div className={styles.todoList}>
       <div className={styles.todoListContainer}>
         <TaskInput addTodo={addTodo} currentTodo={currentTodo} editTodo={editTodo} finishEditTodo={finishEditTodo} />
-        <TaskList todos={notdoneTodo} handlerDoneTodo={handlerDoneTodo} startEditTodo={startEditTodo} />
-        <TaskList doneTaskList todos={doneTodo} handlerDoneTodo={handlerDoneTodo} startEditTodo={startEditTodo} />
+        <TaskList
+          todos={notdoneTodo}
+          handlerDoneTodo={handlerDoneTodo}
+          startEditTodo={startEditTodo}
+          deleteTodo={deleteTodo}
+        />
+        <TaskList
+          doneTaskList
+          todos={doneTodo}
+          handlerDoneTodo={handlerDoneTodo}
+          startEditTodo={startEditTodo}
+          deleteTodo={deleteTodo}
+        />
       </div>
     </div>
   )
